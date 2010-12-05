@@ -12,6 +12,7 @@ unix domain socket `/dev/log`) in
 [RFC 3164](http://www.faqs.org/rfcs/rfc3164.html).
 
 *In the Phoenician alphabet letter "ain" indicates eye.
+
 **All examples tested under Debian Squeeze `rsyslog`. On other operating 
 systems and logging daemons settings and paths may differ.
 
