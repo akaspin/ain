@@ -65,17 +65,26 @@ function format(f) {
   return str;
 }
 
+function leadZero(n) {
+    if (n < 10) {
+        return '0' + n;
+    } else {
+        return n;
+    }
+}
+
 /**
  * Get current date in syslog format. Thanks https://github.com/kordless/lodge
  * @returns {String}
  */
 function getDate() {
     var dt = new Date();
-    var hours = dt.getHours();
-    var minutes = dt.getMinutes();
-    var seconds = dt.getSeconds();
+    var hours = leadZero(dt.getHours());
+    var minutes = leadZero(dt.getMinutes());
+    var seconds = leadZero(dt.getSeconds());
     var month = dt.getMonth();
     var day = dt.getDate();
+    (day < 10) && (day = ' ' + day);
     var months = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug',
             'Sep', 'Oct', 'Nov', 'Dec' ];
     return months[month] + " " + day + " " + hours + ":" + minutes
@@ -88,10 +97,11 @@ function getDate() {
  * @returns {SysLogger}
  */
 function SysLogger() {
+    this.times = {};
 }
 /**
  * Init function
- * @param {Facility|Number|String} facility
+ * @param {Facility|Number|String} Optional facility
  * @param {String} name Optional name. By default is process.argv[1]
  * @param {String} hostname Optional hostname. 
  */
@@ -105,8 +115,8 @@ SysLogger.prototype.init = function(facility, name, hostname) {
 };
 /**
  * Get new instance of SysLogger. 
- * @param {Facility|Number|String} facility
  * @param {String} name Optional name. By default is process.argv[1]
+ * @param {Facility|Number|String} facility
  * @param {String} hostname Optional hostname. 
  * @returns {SysLogger}
  */
@@ -122,14 +132,16 @@ SysLogger.prototype.get = function() {
  */
 SysLogger.prototype._send = function(message, severity) {
     var client = dgram.createSocket('udp4');
-    var message = new Buffer('<' + this.facility * 8 + severity + '>' +
+    var message = new Buffer('<' + (this.facility * 8 + severity) + '>' +
         getDate() + ' ' + this.hostname + ' ' + 
         this.name + '[' + process.pid + ']:' + message);
+    console.log('%s', message);
+    
     client.send(message, 0, message.length, 514, '127.0.0.1', 
         function(err) {
             if (err) console.error('Can\'t connect to localhost:514');
-            client.close();
     });
+    client.close();
 };
 
 /**
@@ -161,6 +173,29 @@ SysLogger.prototype.dir = function(object) {
     this._send(util.inspect(object) + '\n', Severity.notice);
 };
 
+SysLogger.prototype.time = function(label) {
+    this.times[label] = Date.now();
+};
+SysLogger.prototype.timeEnd = function(label) {
+    var duration = Date.now() - this.times[label];
+    this.log('%s: %dms', label, duration);
+};
+
+SysLogger.prototype.trace = function(label) {
+    var err = new Error;
+    err.name = 'Trace';
+    err.message = label || '';
+    Error.captureStackTrace(err, arguments.callee);
+    this.error(err.stack);
+};
+
+SysLogger.prototype.assert = function(expression) {
+    if (!expression) {
+        var arr = Array.prototype.slice.call(arguments, 1);
+        this._send(format.apply(this, arr), Severity.err);
+    }
+};
 
 var logger = new SysLogger();
+logger.init();
 module.exports = logger;
