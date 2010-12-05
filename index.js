@@ -97,32 +97,45 @@ function getDate() {
  * @returns {SysLogger}
  */
 function SysLogger() {
-    this.times = {};
+    this._times = {};
 }
+
 /**
- * Init function
- * @param {Facility|Number|String} Optional facility
- * @param {String} name Optional name. By default is process.argv[1]
- * @param {String} hostname Optional hostname. 
+ * Init function. All arguments is optional
+ * @param {String} tag By default is __filename
+ * @param {Facility|Number|String} By default is "user"
+ * @param {String} hostname By default is "localhost"
  */
-SysLogger.prototype.init = function(facility, name, hostname) {
+SysLogger.prototype.set = function(tag, facility, hostname) {
+    this.setTag(tag);
+    this.setFacility(facility);
+    this.setHostname(hostname);
+    
+    return this;
+};
+
+SysLogger.prototype.setTag = function(tag) {
+    this.tag = tag || __filename;
+    return this;
+};
+SysLogger.prototype.setFacility = function(facility) {
     this.facility = facility || Facility.user;
     if (typeof this.facility == 'string') 
-            this.facility = Facility[this.facility];
-    
-    this.name = name || process.argv[1];
-    this.hostname = hostname || 'localhost';
+        this.facility = Facility[this.facility];
+    return this;
 };
+SysLogger.prototype.setHostname = function(hostname) {
+    this.hostname = hostname || 'localhost';
+    return this;
+};
+
 /**
- * Get new instance of SysLogger. 
- * @param {String} name Optional name. By default is process.argv[1]
- * @param {Facility|Number|String} facility
- * @param {String} hostname Optional hostname. 
+ * Get new instance of SysLogger. All arguments is similar as `init` 
  * @returns {SysLogger}
  */
 SysLogger.prototype.get = function() {
     var newLogger = new SysLogger();
-    newLogger.init.apply(newLogger, arguments);
+    newLogger.set.apply(newLogger, arguments);
     return newLogger;
 };
 /**
@@ -134,9 +147,7 @@ SysLogger.prototype._send = function(message, severity) {
     var client = dgram.createSocket('udp4');
     var message = new Buffer('<' + (this.facility * 8 + severity) + '>' +
         getDate() + ' ' + this.hostname + ' ' + 
-        this.name + '[' + process.pid + ']:' + message);
-    console.log('%s', message);
-    
+        this.tag + '[' + process.pid + ']:' + message);
     client.send(message, 0, message.length, 514, '127.0.0.1', 
         function(err) {
             if (err) console.error('Can\'t connect to localhost:514');
@@ -155,29 +166,44 @@ SysLogger.prototype.send = function(message, severity) {
     this._send(message, severity);
 };
 
+/**
+ * Send log message with notice severity.
+ */
 SysLogger.prototype.log = function() {
     this._send(format.apply(this, arguments), Severity.notice);
 };
+/**
+ * Send log message with info severity.
+ */
 SysLogger.prototype.info = function() {
     this._send(format.apply(this, arguments), Severity.info);
 };
+/**
+ * Send log message with warn severity.
+ */
 SysLogger.prototype.warn = function() {
     this._send(format.apply(this, arguments), Severity.warn);
 };
+/**
+ * Send log message with err severity.
+ */
 SysLogger.prototype.error = function() {
     this._send(format.apply(this, arguments), Severity.err);
 };
 
+/**
+ * Log object with `util.inspect` with notice severity
+ */
 SysLogger.prototype.dir = function(object) {
     var util = require('util');
     this._send(util.inspect(object) + '\n', Severity.notice);
 };
 
 SysLogger.prototype.time = function(label) {
-    this.times[label] = Date.now();
+    this._times[label] = Date.now();
 };
 SysLogger.prototype.timeEnd = function(label) {
-    var duration = Date.now() - this.times[label];
+    var duration = Date.now() - this._times[label];
     this.log('%s: %dms', label, duration);
 };
 
