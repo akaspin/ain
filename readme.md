@@ -15,6 +15,13 @@ unix domain socket `/dev/log`) in
 **All examples tested under Debian Squeeze `rsyslog`. On other operating 
 systems and logging daemons settings and paths may differ.
 
+## Installation
+
+You can install *ain* as usual - by copy "ain" directory in your 
+`~/.node_libraries` or via *npm*
+
+    npm install ain
+
 ## Usage
 
 Usage of *ain* is very similar to *node.js* console. Following example 

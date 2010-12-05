@@ -1,0 +1,26 @@
+{
+    "name" : "ain",
+    "description" : "Syslog logging for node.js",
+    "version" : "0.0.1",
+    "main" : "./index",
+    "author" : "Alexander Dorofeev",
+    "maintainers" : [
+        {
+            "name" : "Alexander Dorofeev",
+            "email" : "aka.spin@gmail.com"
+        }
+    ],
+    "repository" : {
+        "type" : "git",
+        "url" : "http://github.com/akaspin/ain.git"
+    },
+    "bugs" : {
+        "web" : "http://github.com/akaspin/ain/issues"
+    },
+    "licenses" : [
+        {
+            "type": "MIT",
+            "url": "http://github.com/akaspin/ain/master/LICENSE"
+        }
+    ]
+}
