@@ -89,8 +89,8 @@ your messages.
 
 You can set `facility` by `String` or `Number`:
 
-    logger.init('node-test-app', 3);
-    logger.init('node-test-app', 'daemon');
+    logger.set('node-test-app', 3);
+    logger.set('node-test-app', 'daemon');
     
 Also you can set `TAG`, `Facility` and `HOSTNAME` separatelly by `setTag`, 
 `setFacility` and `setHostname` functions. All of them is chainable too.

@@ -130,7 +130,7 @@ SysLogger.prototype.setHostname = function(hostname) {
 };
 
 /**
- * Get new instance of SysLogger. All arguments is similar as `init` 
+ * Get new instance of SysLogger. All arguments is similar as `set` 
  * @returns {SysLogger}
  */
 SysLogger.prototype.get = function() {
@@ -223,5 +223,5 @@ SysLogger.prototype.assert = function(expression) {
 };
 
 var logger = new SysLogger();
-logger.init();
+logger.set();
 module.exports = logger;
