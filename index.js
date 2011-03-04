@@ -63,7 +63,6 @@ function format(f) {
     }
   });
   for (var len = args.length; i < len; ++i) {
-    if(typeof args[i] == "function") continue;
     str += ' ' + args[i];
   }
   return str;
@@ -136,13 +135,12 @@ SysLogger.prototype._setupTCP = function(done) {
     .on("error", function(exception) {
       console.log("tcp connect error : " + exception);
       self.emit("error", exception);
-      if(typeof done != "undefined") done(exception);
     })
     .on("close", function(had_error) {
       self._tcpConnection = null;
     })
     .on("connect", function() {
-      if(typeof done != "undefined") done();
+      done();
     });
 };
 
@@ -154,11 +152,8 @@ SysLogger.prototype._setupTCP = function(done) {
 SysLogger.prototype._sendTCP = function(message, severity, done) {
   var self = this;
   if(this._tcpConnection == null) {
-    this._setupTCP(function(err) {
-      if(err) {
-        if(typeof done != "undefined") done(err);
-      }
-      else self._sendTCP(message, severity, done);
+    this._setupTCP(function() {
+      self._sendTCP(message, severity, done);
     });
     return;
   }
@@ -172,7 +167,7 @@ SysLogger.prototype._sendTCP = function(message, severity, done) {
             console.log('Can\'t connect to '+this.sysloghost+':'+this.port + ':' + err);
             self.emit("error", 'Can\'t connect to '+this.sysloghost+':'+this.port + ':' + err);
           }
-          if(done) done(err);
+          if(done !== undefined) done(err);
   });
 };
 
@@ -282,9 +277,9 @@ SysLogger.prototype.error = function() {
 /**
  * Log object with `util.inspect` with notice severity
  */
-SysLogger.prototype.dir = function(object,done) {
+SysLogger.prototype.dir = function(object) {
     var util = require('util');
-    this._send(util.inspect(object) + '\n', Severity.notice, done);
+    this._send(util.inspect(object) + '\n', Severity.notice);
 };
 
 SysLogger.prototype.time = function(label) {
@@ -303,10 +298,10 @@ SysLogger.prototype.trace = function(label) {
     this.error(err.stack);
 };
 
-SysLogger.prototype.assert = function(expression,done) {
+SysLogger.prototype.assert = function(expression) {
     if (!expression) {
         var arr = Array.prototype.slice.call(arguments, 1);
-        this._send(format.apply(this, arr), Severity.err, done);
+        this._send(format.apply(this, arr), Severity.err);
     }
 };
 
