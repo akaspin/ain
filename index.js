@@ -190,6 +190,12 @@ SysLogger.prototype.warn = function() {
 SysLogger.prototype.error = function() {
     this._send(format.apply(this, arguments), Severity.err);
 };
+/**
+ * Send log message with debug severity.
+ */
+SysLogger.prototype.debug = function() {
+    this._send(format.apply(this, arguments), Severity.debug);
+};
 
 /**
  * Log object with `util.inspect` with notice severity
