@@ -1,6 +1,7 @@
 # ain*
 
-*I do not support this more. If you need it, just fork it*
+*I do not support this more.* Use [this](https://github.com/phuesler/ain).
+
 
 Brain-free [syslog](http://en.wikipedia.org/wiki/Syslog)** logging for 
 [node.js](http://nodejs.org).
