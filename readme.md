@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/akaspin/ain.png)](http://travis-ci.org/akaspin/ain)
 # ain*
 
 *I do not support this more.* Use [this](https://github.com/phuesler/ain).
