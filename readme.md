@@ -61,7 +61,7 @@ You can change them by `set` function. `set` function is chainable.
 
     Dec  5 07:08:58 devhost node-test-app[10045]: some warning
     
-`set` function takes three arguments: `tag`, `facility` and `hostname`. All 
+`set` function takes three arguments: `tag`, `facility`, `hostname`, `sysloghost`, and `port`. All 
 of these are optional.
 
 `tag` and `hostname` arguments is just *RFC 3164* `TAG` and `HOSTNAME` of 
@@ -103,6 +103,14 @@ You can get all destinations by theese properties:
 * `tag` TAG
 * `facility` Numerical representation of RFC 3164 facility
 * `hostname` HOSTNAME
+
+`sysloghost` allows you to optionally specify an alternate remote syslog host:port, for example,
+to send log messages to a syslog server running on the host `myloggingserver.com` using the default port (514),
+specify `myloggingserver.com` -- to use a non-standard port, separate it from the hostname with a `:`,
+example `myloggingserver.com:5140`.  The default is `localhost:514`.
+
+`protocol` allows you to specify what transport protocol to use to send log messages, the default is `udp`,
+however, you can specify `tcp` here for reliable log delivery over TCP.
 
 ## Logging
 
